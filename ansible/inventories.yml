@@ -1,0 +1,9 @@
+---
+all:
+  children:
+    kafkaConfluent:
+      hosts:
+        52.148.184.202:
+          ansible_connection: ssh
+          ansible_user: tungduong
+          ansible_ssh_private_key_file: ../ssh/id_rsa"

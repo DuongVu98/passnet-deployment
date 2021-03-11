@@ -1,0 +1,13 @@
+- hosts: kafkaConfluent
+  become: yes
+  tasks:
+
+    - name: Creates directory
+      file:
+        path: /home/tungduong/kafka-confluent
+        state: directory
+
+    - name: Copy Docker compose file
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/tungduong/kafka-confluent/docker-compose.yml
