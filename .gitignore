@@ -35,4 +35,16 @@ override.tf.json
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform
 
+### Vagrant ###
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+*.log
+
+### Vagrant Patch ###
+*.box
+
+# End of https://www.toptal.com/developers/gitignore/api/vagrant
+
 ssh/*
