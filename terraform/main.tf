@@ -20,8 +20,8 @@ module "my_server" {
   server_address_prefix  = "1.0.2.0/24"
   server_address_space   = "1.0.0.0/22"
   server_name            = "kafka-confluent-server"
-  vm_size                = "Standard_B2s"
+  vm_size                = "Standard_B2ms"
   admin_username         = "tungduong"
   ssh_key_path           = "../ssh/id_rsa.pub"
-  environment            = "development"
+  environment            = "production"
 }
