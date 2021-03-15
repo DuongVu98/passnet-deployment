@@ -4,12 +4,19 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 2.26"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "3.59.0"
+    }
   }
 }
 
 provider "azurerm" {
   features {
   }
+}
+provider "google" {
+  # Configuration options
 }
 
 module "my_server" {
