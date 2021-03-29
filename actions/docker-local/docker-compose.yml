@@ -1,50 +1,55 @@
 version: "3.7"
 
 services:
-  passnet-recruitment:
-    image: tony16019/passnet-recruitment:latest
-    environment:
-      - PROFILE=prod
-      - DATABASE_URL=jdbc:postgresql://passnet-recruitment-db:5432/passnet_recruitment_db
-      - DATABASE_USERNAME=passnet_recruitment_app
-      - DATABASE_PASSWORD=tungduong98
-      - GRPC_PORT_LISTENER=9090
-      - SAGA_GRPC_HOST=passnet-recruitment-saga
-      - SAGA_GRPC_PORT=6565
+  # Passnet Recruitment Service
+  passnet-recruitment-service:
+    image: openjdk:15-alpine
+    container_name: passnet_recruitment_dev
+    volumes:
+      - "${PROJECT_PATH}/passnet-recruitment:/app/passnet-recruitment-service:rw"
+    command: "java -jar /app/passnet-recruitment-service/build/libs/PassnetRecruitment.jar --spring.profiles.active=local"
     ports:
       - 8080:8080
       - 9090:9090
-
+  
   passnet-recruitment-saga:
-    image: tony16019/passnet-recruitment-saga:latest
-    environment:
-      - PROFILE=prod
-      - KAFKA_BOOTSTRAP_SERVERS=http://52.148.184.202:9092
-      - TOPIC_POST_NEW_JOB_EVENT=post-new-job-event
-      - TOPIC_ACCEPT_STUDENT_APPLICATION_EVENT7=accept-student-application-event
-      - TOPIC_REMOVE_STUDENT_APPLICATION_EVENT=remove-student-application-event
-      - TOPIC_DELETE_JOB_EVENT=delete-job-event
-      - KAFKA_SCHEMA_REGISTRY_URL=http://52.148.184.202:8081
-      - GRPC_PORT_LISTENER=6565
-      - MAIN_SERVICE_GRPC_HOST=passnet-recruitment
-      - MAIN_SERVICE_GRPC_PORT=9090
+    image: openjdk:15-alpine
+    container_name: passnet_recruitment_saga_dev
+    volumes:
+      - "${PROJECT_PATH}/sagas/v1/saga-recruitment:/app/passnet-recruitment-saga:rw"
+    command: "java -jar /app/passnet-recruitment-saga/build/libs/PassnetRecruitmentSaga.jar --spring.profiles.active=local"
+    ports:
+      - 6565:6565
+    depends_on:
+      - passnet-recruitment-service
   
 
-  passnet-recruitment-db:
-    image: postgres:latest
-    environment:
-      - POSTGRES_USER=passnet_recruitment_app
-      - POSTGRES_PASSWORD=tungduong98
-      - POSTGRES_DB=passnet_recruitment_db
+  # Passnet Classroom Service
+  passnet-classroom-service:
+    image: node:15.12.0-alpine3.10
+    container_name: passnet_classroom_dev
     volumes:
-      - database-data:/var/lib/postgresql/data/
+      - "${PROJECT_PATH}/passnet-classroom:/app/passnet-classroom-service:rw"
+    command: "npm --prefix /app/passnet-classroom-service run start:dev"
     ports:
-      - 5432:5432
-    
+      - 3000:3000
+      - 50051:50051
+
+  passnet-classroom-saga:
+    image: openjdk:15-alpine
+    container_name: passnet_classroom_saga_dev
+    volumes:
+      - "${PROJECT_PATH}/sagas/v1/saga-classroom:/app/passnet-classroom-saga:rw"
+    command: "java -jar /app/passnet-classroom-saga/build/libs/PassnetClassroomSaga.jar --spring.profiles.active=local"
+    ports:
+      - 6566:6566
+    depends_on:
+      - passnet-classroom-service
+  
   passnet-classroom-db:
     image: mongo:latest
-    container_name: "passnet_classroom_db"
-    hostname: "passnet-classroom-db"
+    container_name: passnet_classroom_db
+    hostname: passnet-classroom-db
     environment:
       - MONGO_INITDB_DATABASE=passnet_classroom_db
       - MONGO_INITDB_ROOT_USERNAME=root
@@ -57,10 +62,8 @@ services:
   
   passnet-classroom-cache:
     image: redis:latest
-    container_name: "passnet_classroom_cache"
-    hostname: "passnet-classroom-cache"
+    container_name: passnet_classroom_cache
+    hostname: passnet-classroom-cache
     ports:
       - 6379:6379
-
-volumes:
-  database-data:
+  
