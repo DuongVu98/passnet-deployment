@@ -34,6 +34,9 @@ services:
     ports:
       - 3000:3000
       - 50051:50051
+    depends_on:
+      - passnet-classroom-db
+      - passnet-classroom-cache
 
   passnet-classroom-saga:
     image: openjdk:15-alpine
