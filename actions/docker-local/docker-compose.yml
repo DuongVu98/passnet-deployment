@@ -1,56 +1,48 @@
-version: "3.7"
-
+version: '3.7'
 services:
-  # Passnet Recruitment Service
   passnet-recruitment-service:
-    image: openjdk:15-alpine
+    image: 'openjdk:15-alpine'
     container_name: passnet_recruitment_dev
     volumes:
-      - "${PROJECT_PATH}/passnet-recruitment:/app/passnet-recruitment-service:rw"
-    command: "java -jar /app/passnet-recruitment-service/build/libs/PassnetRecruitment.jar --spring.profiles.active=local"
+      - '${PROJECT_PATH}/passnet-recruitment:/app/passnet-recruitment-service:rw'
+    command: java -jar /app/passnet-recruitment-service/build/libs/PassnetRecruitment.jar --spring.profiles.active=docker
     ports:
-      - 8080:8080
-      - 9090:9090
-  
+      - '8080:8080'
+      - '9090:9090'
   passnet-recruitment-saga:
-    image: openjdk:15-alpine
+    image: 'openjdk:15-alpine'
     container_name: passnet_recruitment_saga_dev
     volumes:
-      - "${PROJECT_PATH}/sagas/v1/saga-recruitment:/app/passnet-recruitment-saga:rw"
-    command: "java -jar /app/passnet-recruitment-saga/build/libs/PassnetRecruitmentSaga.jar --spring.profiles.active=local"
+      - '${PROJECT_PATH}/sagas/v1/saga-recruitment:/app/passnet-recruitment-saga:rw'
+    command: java -jar /app/passnet-recruitment-saga/build/libs/PassnetRecruitmentSaga.jar --spring.profiles.active=docker
     ports:
-      - 6565:6565
+      - '6565:6565'
     depends_on:
       - passnet-recruitment-service
-  
-
-  # Passnet Classroom Service
   passnet-classroom-service:
-    image: node:15.12.0-alpine3.10
+    image: 'node:15.12.0-alpine3.10'
     container_name: passnet_classroom_dev
     volumes:
-      - "${PROJECT_PATH}/passnet-classroom:/app/passnet-classroom-service:rw"
-    command: "npm --prefix /app/passnet-classroom-service run start:dev"
+      - '${PROJECT_PATH}/passnet-classroom:/app/passnet-classroom-service:rw'
+    command: 'npm --prefix /app/passnet-classroom-service run start:docker'
     ports:
-      - 3000:3000
-      - 50051:50051
+      - '3000:3000'
+      - '50051:50051'
     depends_on:
       - passnet-classroom-db
       - passnet-classroom-cache
-
   passnet-classroom-saga:
-    image: openjdk:15-alpine
+    image: 'openjdk:15-alpine'
     container_name: passnet_classroom_saga_dev
     volumes:
-      - "${PROJECT_PATH}/sagas/v1/saga-classroom:/app/passnet-classroom-saga:rw"
-    command: "java -jar /app/passnet-classroom-saga/build/libs/PassnetClassroomSaga.jar --spring.profiles.active=local"
+      - '${PROJECT_PATH}/sagas/v1/saga-classroom:/app/passnet-classroom-saga:rw'
+    command: java -jar /app/passnet-classroom-saga/build/libs/PassnetClassroomSaga.jar --spring.profiles.active=docker
     ports:
-      - 6566:6566
+      - '6566:6566'
     depends_on:
       - passnet-classroom-service
-  
   passnet-classroom-db:
-    image: mongo:4.4.4-bionic
+    image: 'mongo:4.4.4-bionic'
     container_name: passnet_classroom_db
     hostname: passnet-classroom-db
     environment:
@@ -58,15 +50,13 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=tungduong98
     volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./mongo-volume:/data/db
+      - './init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro'
+      - './mongo-volume:/data/db'
     ports:
-      - "27017-27019:27017-27019"
-  
+      - '27017-27019:27017-27019'
   passnet-classroom-cache:
-    image: redis:latest
+    image: 'redis:latest'
     container_name: passnet_classroom_cache
     hostname: passnet-classroom-cache
     ports:
-      - 6379:6379
-  
+      - '6379:6379'
