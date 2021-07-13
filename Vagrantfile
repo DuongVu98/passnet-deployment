@@ -7,6 +7,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder ".", "/home/vagrant/app", :onwer => "vagrant"
   config.vm.synced_folder "./ssh", "/home/vagrant/ssh", :onwer => "vagrant", mount_options: ["dmode=777,fmode=400"] 
+  config.vm.synced_folder "../", "/home/vagrant/passnet", :onwer => "vagrant"
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 2048

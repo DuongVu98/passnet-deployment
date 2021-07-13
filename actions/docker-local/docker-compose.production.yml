@@ -1,0 +1,79 @@
+version: "3.7"
+
+services:
+  passnet-recruitment:
+    image: tony16019/passnet-recruitment:latest
+    environment:
+      - PROFILE=prod
+      - DATABASE_URL=jdbc:postgresql://passnet-recruitment-db:5432/passnet_recruitment_db
+      - DATABASE_USERNAME=passnet_recruitment_app
+      - DATABASE_PASSWORD=tungduong98
+      - GRPC_PORT_LISTENER=9090
+      - SAGA_GRPC_HOST=passnet-recruitment-saga
+      - SAGA_GRPC_PORT=6565
+    ports:
+      - 8080:8080
+      - 9090:9090
+
+  passnet-recruitment-saga:
+    image: tony16019/passnet-recruitment-saga:latest
+    environment:
+      - PROFILE=prod
+      - KAFKA_BOOTSTRAP_SERVERS=http://52.148.184.202:9092
+      - TOPIC_POST_NEW_JOB_EVENT=post-new-job-event
+      - TOPIC_ACCEPT_STUDENT_APPLICATION_EVENT7=accept-student-application-event
+      - TOPIC_REMOVE_STUDENT_APPLICATION_EVENT=remove-student-application-event
+      - TOPIC_DELETE_JOB_EVENT=delete-job-event
+      - KAFKA_SCHEMA_REGISTRY_URL=http://52.148.184.202:8081
+      - GRPC_PORT_LISTENER=6565
+      - MAIN_SERVICE_GRPC_HOST=passnet-recruitment
+      - MAIN_SERVICE_GRPC_PORT=9090
+  
+  passnet-classroom:
+    image: tony16019/passnet-classroom:latest
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT_LISTENER=3000
+      - DATABASE_URL=mongodb://root:tungduong98@passnet-classroom-db:27017/passnet_classroom_db
+      - CACHE_CONNECTION_HOST=passnet-classroom-cache
+      - CACHE_CONNECTION_PORT=6379
+      - GRPC_OPTION_URL=localhost:50051
+      - GRPC_OPTION_PACKAGE=consumeEvents
+    ports:
+      - 3000:3000
+  
+
+  passnet-recruitment-db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=passnet_recruitment_app
+      - POSTGRES_PASSWORD=tungduong98
+      - POSTGRES_DB=passnet_recruitment_db
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    
+  passnet-classroom-db:
+    image: mongo:latest
+    container_name: "passnet_classroom_db"
+    hostname: "passnet-classroom-db"
+    environment:
+      - MONGO_INITDB_DATABASE=passnet_classroom_db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=tungduong98
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-volume:/data/db
+    ports:
+      - "27017-27019:27017-27019"
+  
+  passnet-classroom-cache:
+    image: redis:latest
+    container_name: "passnet_classroom_cache"
+    hostname: "passnet-classroom-cache"
+    ports:
+      - 6379:6379
+
+volumes:
+  database-data:
