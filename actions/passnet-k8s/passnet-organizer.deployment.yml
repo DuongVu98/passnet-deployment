@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: passnet-organizer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      backend: passnet_organizer_service
+  template:
+    metadata:
+      name: passnet-organizer-service
+      labels:
+        backend: passnet_organizer_service
+    spec:
+      containers:
+        - name: passnet-organizer-service
+          image: tony16019/passnet-organizer
+          ports:
+            - name: rest
+              containerPort: 8084
+            - name: grpc
+              containerPort: 7074
+          env:
+            - name: PROFILE
+              value: "prod"
+            - name: SERVER_PORT_LISTENER
+              value: "8084"
+            - name: DATABASE_URL
+              value: jdbc:mysql://20.97.232.173:3306/passnet_organizer_db
+            - name: DATABASE_USERNAME
+              value: "root"
+            - name: DATABASE_PASSWORD
+              value: "root"
+            - name: GRPC_PORT_LISTENER
+              value: "7074"
+            - name: ORGANIZER_SAGA_ADDRESS
+              value: "passnet-organizer-cluster-ip:6164"
+
+        - name: passet-organizer-saga
+          image: tony16019/passnet-organizer-saga
+          ports:
+            - name: saga-grpc
+              containerPort: 6164
+          env:
+            - name: PROFILE
+              value: "prod"
+            - name: ORGANIZER_SERVICE_GRPC_ADDRESS
+              value: "passnet-organizer-cluster-ip:7074"
+            - name: ORGANIZER_SAGA_PORT
+              value: "6164"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: passnet-organizer-cluster-ip
+spec:
+  type: ClusterIP
+  selector:
+    backend: passnet_organizer_service
+  ports:
+    - name: organizer-service-rest
+      port: 8084
+      targetPort: rest
+    - name: organizer-service-grpc
+      port: 7074
+      targetPort: grpc
+    - name: organizer-saga-grpc
+      port: 6164
+      targetPort: saga-grpc

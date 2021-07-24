@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=tungduong98
+      - POSTGRES_USER=admin
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+  mysql-server:
+    image: mysql:5.7
+    container_name: mysql-server
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=passnet_profile_app
+      - MYSQL_PASSWORD=tungduong98
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+volumes:
+  postgres-data:
+  mysql-data: {}

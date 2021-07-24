@@ -1,0 +1,17 @@
+- hosts: passnetApp
+  become: yes
+  tasks:
+    - name: Creates directory
+      file:
+        path: /home/tony/passnet
+        state: directory
+
+    - name: Copy Docker compose file
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/tony/passnet/docker-compose.yml
+
+    - name: Copy Docker compose file
+      copy:
+        src: ./docker-compose.database.yml
+        dest: /home/tony/passnet/docker-compose.database.yml

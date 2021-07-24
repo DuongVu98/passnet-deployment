@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: passnet-user-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      backend: passnet_user_service
+  template:
+    metadata:
+      name: passnet-user-service
+      labels:
+        backend: passnet_user_service
+    spec:
+      containers:
+        - name: passnet-user-service
+          image: tony16019/passnet-user
+          ports:
+            - name: user-rest
+              containerPort: 8080
+            - name: user-grpc
+              containerPort: 7070
+          env:
+            - name: ENV
+              value: "development"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: GRPC_PORT
+              value: "7070"
+            - name: GRPC_SAGA_HOST
+              value: "passnet-user-cluster-ip"
+            - name: GRPC_SAGA_PORT
+              value: "6160"
+        - name: passnet-user-saga
+          image: tony16019/passnet-user-saga
+          ports:
+            - name: user-saga-grpc
+              containerPort: 6160
+          env:
+            - name: PROFILE
+              value: "prod"
+            - name: USER_SERVICE_GRPC_HOST
+              value: "passnet-user-cluster-ip"
+            - name: USER_SERVICE_GRPC_PORT
+              value: "7070"
+            - name: USER_SAGA_PORT
+              value: "6160"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: passnet-user-cluster-ip
+spec:
+  type: ClusterIP
+  selector:
+    backend: passnet_user_service
+  ports:
+    - name: user-service-rest
+      port: 8080
+      targetPort: user-rest
+    - name: user-service-grpc
+      port: 7070
+      targetPort: user-grpc
+    - name: user-saga-grpc
+      port: 6160
+      targetPort: user-saga-grpc

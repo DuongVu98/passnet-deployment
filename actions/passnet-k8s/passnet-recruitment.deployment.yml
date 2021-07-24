@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: passnet-recruitment-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      backend: passnet_recruitment_service
+  template:
+    metadata:
+      name: passnet-recruitment-service
+      labels:
+        backend: passnet_recruitment_service
+    spec:
+      containers:
+        - name: passnet-recruitment-service
+          image: tony16019/passnet-recruitment
+          ports:
+            - name: rest
+              containerPort: 8082
+            - name: grpc
+              containerPort: 7072
+          env:
+            - name: PROFILE
+              value: "prod"
+            - name: DATABASE_URL
+              value: "jdbc:postgresql://20.97.232.173:5432/passnet_recruitment_db"
+            - name: DATABASE_USERNAME
+              value: "admin"
+            - name: DATABASE_PASSWORD
+              value: "tungduong98"
+            - name: GRPC_PORT_LISTENER
+              value: "7072"
+            - name: SERVER_PORT_LISTENER
+              value: "8082"
+            - name: RECRUITMENT_SAGA_ADDRESS
+              value: "passnet-recruitment-cluster-ip:6162"
+        - name: passnet-recruitment-saga
+          image: tony16019/passnet-recruitment-saga
+          ports:
+            - name: saga-grpc
+              containerPort: 6162
+          env:
+            - name: PROFILE
+              value: "prod"
+            - name: RECRUITMENT_SERVICE_GRPC_ADDRESS
+              value: "passnet-recruitment-cluster-ip:7072"
+            - name: RECRUITMENT_SAGA_PORT
+              value: "6162"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: passnet-recruitment-cluster-ip
+spec:
+  type: ClusterIP
+  selector:
+    backend: passnet_recruitment_service
+  ports:
+    - name: recruitment-service-rest
+      port: 8082
+      targetPort: rest
+    - name: recruitment-service-grpc
+      port: 7072
+      targetPort: grpc
+    - name: recruitment-saga-grpc
+      port: 6162
+      targetPort: saga-grpc

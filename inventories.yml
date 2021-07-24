@@ -2,9 +2,9 @@
 all:
   hosts:
   children:
-    kafkaConfluent:
+    passnetApp:
       hosts:
-        20.69.120.200:
+        20.97.232.173:
           ansible_connection: ssh
-          ansible_user: tungduong
-          ansible_ssh_private_key_file: ../ssh/id_rsa"
+          ansible_user: tony
+          ansible_ssh_pass: passnetSecrets159
