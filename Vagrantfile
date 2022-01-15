@@ -1,7 +1,8 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "icattlecoder/centos7-k8s"
+  config.vm.box_version = "1.15.0"
 
   config.vm.network "private_network", ip: "192.168.33.10"
 
@@ -17,10 +18,10 @@ Vagrant.configure("2") do |config|
   config.vm.provision "docker"
   config.vm.provision :docker_compose
 
-  config.vm.provision "ping-hosts", type: "ansible" do |ansible|
-    ansible.playbook = "./playbook.yml"
-    ansible.inventory_path = "./inventories.yml" 
-  end
+#   config.vm.provision "ping-hosts", type: "ansible" do |ansible|
+#     ansible.playbook = "./playbook.yml"
+#     ansible.inventory_path = "./inventories.yml" 
+#   end
 
   # config.vm.provision "shell", inline: <<-SHELL
   #   apt-get update
