@@ -36,6 +36,10 @@ spec:
               value: "8082"
             - name: RECRUITMENT_SAGA_ADDRESS
               value: "passnet-recruitment-cluster-ip:6162"
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
         - name: passnet-recruitment-saga
           image: tony16019/passnet-recruitment-saga
           ports:
@@ -48,6 +52,10 @@ spec:
               value: "passnet-recruitment-cluster-ip:7072"
             - name: RECRUITMENT_SAGA_PORT
               value: "6162"
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
 ---
 apiVersion: v1
 kind: Service

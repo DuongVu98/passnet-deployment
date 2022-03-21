@@ -36,6 +36,10 @@ spec:
               value: "7074"
             - name: ORGANIZER_SAGA_ADDRESS
               value: "passnet-organizer-cluster-ip:6164"
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
 
         - name: passet-organizer-saga
           image: tony16019/passnet-organizer-saga
@@ -49,6 +53,10 @@ spec:
               value: "passnet-organizer-cluster-ip:7074"
             - name: ORGANIZER_SAGA_PORT
               value: "6164"
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
 ---
 apiVersion: v1
 kind: Service
